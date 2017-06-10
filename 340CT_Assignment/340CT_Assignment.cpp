@@ -66,7 +66,7 @@ void aes_encryptdecrypt() {
 	\*********************************/
 	cin.ignore();
 	cout << "AES Encryption" << endl;
-	cout << "Enter plain text : ";
+	cout << "Please Enter plain text : ";
 	getline(cin, plain);
 
 	// Pretty print key
@@ -95,7 +95,7 @@ void aes_encryptdecrypt() {
 
 	try
 	{
-		cout << "plain text: " << plain << endl;
+		cout << "Plain text: " << plain << endl;
 
 		CBC_Mode< AES >::Encryption e;
 		e.SetKeyWithIV(key, sizeof(key), iv);
@@ -133,7 +133,7 @@ void aes_encryptdecrypt() {
 			new StringSink(encoded)
 		) // HexEncoder
 	); // StringSource
-	cout << "cipher text: " << encoded << endl;
+	cout << "Cipher text: " << encoded << endl;
 
 	/*********************************\
 	\*********************************/
@@ -160,7 +160,7 @@ void aes_encryptdecrypt() {
 		filter.Get((byte*)recovered.data(), recovered.size());
 #endif
 
-		cout << "recovered text: " << recovered << endl;
+		cout << "Recovered text: " << recovered << endl;
 	}
 	catch (const CryptoPP::Exception& e)
 	{
@@ -180,7 +180,8 @@ void rc4()
 	system("cls");
 	char text[999];
 	cin.ignore();
-	cout << "Enter Plain text : ";
+	cout << "RC4 Stream Cipher Encryption" << endl;
+	cout << "Please Enter Plain text : ";
 	cin.getline(text, sizeof(text));
 
 
@@ -202,16 +203,16 @@ void rc4()
 }
 
 void sha256() {
-
+	
+	system("cls");
 	cin.ignore();
 	char i;
 
 	do {
 		string input;
-		cout << "Please input message: ";
-		//cin.ignore();
+		cout << "Sha256 Encryption" << endl;
+		cout << "Please input Plain Text: ";
 		getline(cin, input);
-		//cin >> input;
 
 
 		string output1 = sha256(input);
@@ -236,27 +237,36 @@ void sha256() {
 int main()
 {
 	int choice;
-
 	system("cls");
-	cout << "Choose your encryption method" << endl;
-	cout << "1. AES" << endl;
-	cout << "2. RC4" << endl;
-	cout << "3. SHA256" << endl;
-	cout << "choice? : ";
-	cin >> choice;
 
-	if (choice == 1)
+	do
 	{
-		aes_encryptdecrypt();
-	}
-	else if (choice == 2)
-	{
-		rc4();
-	}
-	else if (choice == 3)
-	{
-		sha256();
-	}
+		cout << "Choose your encryption method" << endl;
+		cout << "1. AES" << endl;
+		cout << "2. RC4" << endl;
+		cout << "3. SHA256" << endl;
+		cout << "choice? : ";
+		cin >> choice;
+
+		if (choice == 1)
+		{
+			aes_encryptdecrypt();
+		}
+		else if (choice == 2)
+		{
+			rc4();
+		}
+		else if (choice == 3)
+		{
+			sha256();
+		}
+		else
+		{
+			cout << endl;
+			cout << "Invalid selection." << endl;
+		}
+	} while (choice < 0 || choice > 4);
+
 
     return 0;
 }
