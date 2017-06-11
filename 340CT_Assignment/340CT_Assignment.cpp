@@ -64,11 +64,7 @@ void aes_encryptdecrypt() {
 	byte iv[AES::BLOCKSIZE];
 	prng.GenerateBlock(iv, sizeof(iv));
 
-
-
 	cin.ignore();
-
-
 	cout << "AES Encryption" << endl;
 	cout << "Please Enter Message : ";
 	getline(cin, plain);
