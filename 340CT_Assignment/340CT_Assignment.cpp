@@ -45,33 +45,36 @@ using CryptoPP::AES;
 
 using CryptoPP::CBC_Mode;
 
+
 int main();
 
 void aes_encryptdecrypt() {
+
+	string plain;
 
 	system("cls");
 	AutoSeededRandomPool prng;
 	string cipher, encoded, recovered;
 
 	encoded.clear();
+	//128bit default keylength
 	byte key[AES::DEFAULT_KEYLENGTH];
 	prng.GenerateBlock(key, sizeof(key));
 
 	byte iv[AES::BLOCKSIZE];
 	prng.GenerateBlock(iv, sizeof(iv));
 
-	string plain;
 
 
-	/*********************************\
-	\*********************************/
 	cin.ignore();
+
+
 	cout << "AES Encryption" << endl;
-	cout << "Please Enter plain text : ";
+	cout << "Please Enter Message : ";
 	getline(cin, plain);
 
 	// Pretty print key
-	encoded.clear();
+
 	StringSource(key, sizeof(key), true,
 		new HexEncoder(
 			new StringSink(encoded)
@@ -90,9 +93,6 @@ void aes_encryptdecrypt() {
 	); // StringSource
 	cout << "iv : " << encoded << endl;
 	cout << "size of iv :" << sizeof(iv) << endl;
-
-	/*********************************\
-	\*********************************/
 
 	try
 	{
@@ -117,15 +117,13 @@ void aes_encryptdecrypt() {
 		cipher.resize(ret);
 		filter.Get((byte*)cipher.data(), cipher.size());
 #endif
+
 	}
 	catch (const CryptoPP::Exception& e)
 	{
 		cerr << e.what() << endl;
 		exit(1);
 	}
-
-	/*********************************\
-	\*********************************/
 
 	// Pretty print
 	encoded.clear();
@@ -135,9 +133,6 @@ void aes_encryptdecrypt() {
 		) // HexEncoder
 	); // StringSource
 	cout << "Cipher text: " << encoded << endl;
-
-	/*********************************\
-	\*********************************/
 
 	try
 	{
@@ -169,38 +164,93 @@ void aes_encryptdecrypt() {
 		exit(1);
 	}
 
-	/*********************************\
-	\*********************************/
-
 	system("pause");
 	main();
+
 }
 
 void rc4()
 {
-	system("cls");
+	Cryptography::CryptographyToolkit tool;
+
+	string key;
+	int choice;
 	char text[999];
+
+	cout << "Generate 4 byte key: " << tool.keygen(32) << endl;
+	cout << "Generate 8 byte key: " << tool.keygen(64) << endl;
+	cout << "Generate 12 byte key: " << tool.keygen(128) << endl;
+	cout << "Generate 32 byte key: " << tool.keygen(256) << endl;
+	cout << "Generate 64 byte key: " << tool.keygen(512) << endl;
+
+	const unsigned int BLOCKSIZE = (1024 / 8); // 128 byte
+
+	system("cls");
+
+	do
+	{
+		cout << "Please select your length of key" << endl;
+		cout << "1. 32bit Key" << endl;
+		cout << "2. 64bit Key" << endl;
+		cout << "3. 128bit Key" << endl;
+		cout << "4. 256bit Key" << endl;
+		cout << "5. 512bit Key" << endl;
+		cout << "choice? ";
+
+		cin >> choice;
+
+		if (choice == 1)
+		{
+			system("cls");
+			cout << "32bit key : " << tool.keygen(32) << endl;
+			key = tool.keygen(32);
+		}
+		else if (choice == 2)
+		{
+			system("cls");
+			cout << "64bit key : " << tool.keygen(64) << endl;
+			key = tool.keygen(64);
+		}
+		else if (choice == 3)
+		{
+			system("cls");
+			cout << "128bit key : " << tool.keygen(128) << endl;
+			key = tool.keygen(128);
+		}
+		else if (choice == 4)
+		{
+			system("cls");
+			cout << "256bit key : " << tool.keygen(256) << endl;
+			key = tool.keygen(256);
+
+		}
+		else if (choice == 5)
+		{
+			system("cls");
+			cout << "512bit key : " << tool.keygen(512) << endl;
+			key = tool.keygen(512);
+		}
+		else
+		{
+			cout << "Invalid selection" << endl;
+		}
+	} while (choice < 0 || choice > 5);
+
+	system("cls");
+
 	cin.ignore();
 	cout << "RC4 Stream Cipher Encryption" << endl;
 	cout << "Please Enter Plain text : ";
 	cin.getline(text, sizeof(text));
 
-
-	//char str[64] = "This is a test for RC4 cypher";
 	/* Test rc4 encoding and decoding here */
 	CRC4 rc4;
-	cout << "RC4 Encryption \n\n";
+	cout << "\nRC4 Encryption \n\n";
 	cout << "Plain text: " << text << endl;
-	rc4.Encrypt(text, "Key");
-	cout << "Encoded string: " << text << endl;;
-	rc4.Decrypt(text, "Key");
-	cout << "Decoded string: " << text << endl;
-	/* Test Base64  encoding and decoding here */
-	//strcpy(text, "This is a test for Base64 cypher");
-
-	//getchar();
-	system("pause");
-	main();
+	rc4.Encrypt(text, key.c_str());
+	cout << "Cipher Text: " << text << endl;;
+	rc4.Decrypt(text, key.c_str());
+	cout << "Recovered Text: " << text << endl;
 }
 
 void sha256() {
@@ -218,7 +268,8 @@ void sha256() {
 
 		string output1 = sha256(input);
 
-		cout << "SHA 256('" << input << "'):" << output1 << endl;
+		cout << "Plain Text : " << input << endl;
+		cout << "SHA 256 : " << output1 << endl;
 		cout << "Do you want to continue? (y/n) ";
 		cin >> i;
 		cin.ignore();
@@ -229,9 +280,8 @@ void sha256() {
 		main();
 	}
 	else {
-		cout << "Wrong input !" << endl;
+		cout << "Invalid input !" << endl;
 	}
-	//system("pause");
 }
 
 void hmacsha() {
@@ -254,7 +304,7 @@ void hmacsha() {
 
 	string message;
 	string key;
-	int choice,i;
+	int choice;
 
 	do
 	{
@@ -330,6 +380,8 @@ void hmacsha() {
 
 	cout << "Plain text : " << message << endl;
 	cout << "hmac-sha512 : " << output << endl;
+
+	system("pause");
 	main();
 }
 
