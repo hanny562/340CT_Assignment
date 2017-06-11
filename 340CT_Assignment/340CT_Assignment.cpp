@@ -6,20 +6,21 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include "Key.h"
+#include "CryptographyToolKit.h"
 
 #include "sha256.h"
+#include "sha512.h"
 #include "rc4.h"
 #include <iostream>
 #include <string>
 
-//#include "CryptographyToolKit.h"
 #include "..\cryptopp565\cryptlib.h"
 #include "..\cryptopp565\filters.h"
 #include "assert.h"
 #include "..\cryptopp565\ccm.h"
 #include "..\cryptopp565\aes.h"
 #include "..\cryptopp565\hex.h"
-//#include "Key.h"
 #include "..\cryptopp565\osrng.h"
 
 using CryptoPP::AutoSeededRandomPool;
@@ -60,7 +61,7 @@ void aes_encryptdecrypt() {
 	prng.GenerateBlock(iv, sizeof(iv));
 
 	string plain;
-	
+
 
 	/*********************************\
 	\*********************************/
@@ -196,14 +197,14 @@ void rc4()
 	cout << "Decoded string: " << text << endl;
 	/* Test Base64  encoding and decoding here */
 	//strcpy(text, "This is a test for Base64 cypher");
-	
+
 	//getchar();
 	system("pause");
 	main();
 }
 
 void sha256() {
-	
+
 	system("cls");
 	cin.ignore();
 	char i;
@@ -219,7 +220,6 @@ void sha256() {
 
 		cout << "SHA 256('" << input << "'):" << output1 << endl;
 		cout << "Do you want to continue? (y/n) ";
-		//cin.ignore;
 		cin >> i;
 		cin.ignore();
 
@@ -234,6 +234,105 @@ void sha256() {
 	//system("pause");
 }
 
+void hmacsha() {
+
+	Cryptography::CryptographyToolkit tool;
+
+
+	cout << "Key Generator for HMACSHA" << endl;
+	// Every 8 bits = 1 bytes
+	// Note** Key gen only able factor of 4 bytes(32 bits)
+	cout << "Generate 4 byte key: " << tool.keygen(32) << endl;
+	cout << "Generate 8 byte key: " << tool.keygen(64) << endl;
+	cout << "Generate 12 byte key: " << tool.keygen(128) << endl;
+	cout << "Generate 32 byte key: " << tool.keygen(256) << endl;
+	cout << "Generate 64 byte key: " << tool.keygen(512) << endl;
+
+	const unsigned int BLOCKSIZE = (1024 / 8); // 128 byte
+
+	system("cls");
+
+	string message;
+	string key;
+	int choice,i;
+
+	do
+	{
+		cout << "Please select your length of key" << endl;
+		cout << "1. 32bit Key" << endl;
+		cout << "2. 64bit Key" << endl;
+		cout << "3. 128bit Key" << endl;
+		cout << "4. 256bit Key" << endl;
+		cout << "5. 512bit Key" << endl;
+		cout << "choice? ";
+
+		cin >> choice;
+
+		if (choice == 1)
+		{
+			system("cls");
+			cout << "32bit key : " << tool.keygen(32) << endl;
+			key = tool.keygen(32);
+		}
+		else if (choice == 2)
+		{
+			system("cls");
+			cout << "64bit key : " << tool.keygen(64) << endl;
+			key = tool.keygen(64);
+		}
+		else if (choice == 3)
+		{
+			system("cls");
+			cout << "128bit key : " << tool.keygen(128) << endl;
+			key = tool.keygen(128);
+		}
+		else if (choice == 4)
+		{
+			system("cls");
+			cout << "256bit key : " << tool.keygen(256) << endl;
+			key = tool.keygen(256);
+
+		}
+		else if (choice == 5)
+		{
+			system("cls");
+			cout << "512bit key : " << tool.keygen(512) << endl;
+			key = tool.keygen(512);
+		}
+		else
+		{
+			cout << "Invalid selection" << endl;
+		}
+	} while (choice < 0 || choice > 5);
+
+	cout << "Please enter message: ";
+	cin.ignore();
+	getline(cin, message);
+
+	if (key.length() > BLOCKSIZE) {
+		key = sha512(key);
+	}
+	while (key.length() < BLOCKSIZE) {
+		key = key + (char)0x00;
+	}
+
+	string o_key_pad = key;
+	for (unsigned int i = 0; i < BLOCKSIZE; i++) {
+		o_key_pad[i] = key[i] ^ (char)0x5c;
+	}
+
+	string i_key_pad = key;
+	for (unsigned int i = 0; i < BLOCKSIZE; i++) {
+		i_key_pad[i] = key[i] ^ (char)0x36;
+	}
+
+	string output = sha512(o_key_pad + sha512(i_key_pad + message));
+
+	cout << "Plain text : " << message << endl;
+	cout << "hmac-sha512 : " << output << endl;
+	main();
+}
+
 int main()
 {
 	int choice;
@@ -245,6 +344,7 @@ int main()
 		cout << "1. AES" << endl;
 		cout << "2. RC4" << endl;
 		cout << "3. SHA256" << endl;
+		cout << "4. HMACSHA" << endl;
 		cout << "choice? : ";
 		cin >> choice;
 
@@ -260,6 +360,10 @@ int main()
 		{
 			sha256();
 		}
+		else if (choice == 4)
+		{
+			hmacsha();
+		}
 		else
 		{
 			cout << endl;
@@ -268,6 +372,6 @@ int main()
 	} while (choice < 0 || choice > 4);
 
 
-    return 0;
+	return 0;
 }
 
